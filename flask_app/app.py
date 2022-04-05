@@ -1,12 +1,15 @@
 from icecream import ic
 
 from flask import Flask
-from flask import request, render_template
+from flask import request, render_template, redirect
 app = Flask(__name__)
 
 import utils
 import utils_boto3
 import search_face
+
+CURRENT_USAGE = 0
+MAX_USAGE = 50
 
 
 @app.route('/')
@@ -21,6 +24,11 @@ def upload_get():
 
 @app.route('/upload', methods=['POST'])
 def upload_post():
+    global CURRENT_USAGE
+    CURRENT_USAGE += 1
+    if CURRENT_USAGE > MAX_USAGE:
+        exit(1)
+    ic(CURRENT_USAGE)
     try:
         file = request.files['file']
         image_bytes = utils.convert_image_bytes_popular(file.read())
@@ -41,3 +49,11 @@ def upload_post():
 def server_error(e):
     r = render_template('error.html', body=str(e.original_exception))
     return r, 500
+
+
+@app.route('/resetgomdev')
+def resetgomdev():
+    global CURRENT_USAGE
+    CURRENT_USAGE = 0
+
+    return redirect('/')
