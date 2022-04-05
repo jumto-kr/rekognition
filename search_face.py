@@ -38,7 +38,7 @@ def search_face_id(face_id: str, collection_id: str):
 
 
 @utils_boto3.handle_request_error
-def search_face_by_image(image_bytes: bytes, collection_id: str, max_matches: int = 10, threshold: int = 70) -> dict:
+def search_face_by_image(image_bytes: bytes, collection_id: str, max_matches: int = 10, threshold: int = 40) -> dict:
     client = boto3.client('rekognition')
     try:
         response = client.search_faces_by_image(CollectionId=collection_id, Image={'Bytes': image_bytes}, FaceMatchThreshold=threshold, MaxFaces=max_matches)
@@ -48,12 +48,15 @@ def search_face_by_image(image_bytes: bytes, collection_id: str, max_matches: in
         raise ImageTooLargeError(boto_exception=e)
     face_matches = response['FaceMatches']
     if len(face_matches) > 1:
-        raise NotImplementedError('Not yet support multiple reference image for a single reference person.')
+        #TODO:
+        # raise NotImplementedError('Not yet support multiple reference image for a single reference person.')
+        pass
 
     if len(face_matches) == 0:
         return None
     else:
-        assert len(face_matches) == 1
+        #TODO:
+        # assert len(face_matches) == 1
         return face_matches[0]
 
 
