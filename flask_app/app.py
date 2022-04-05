@@ -29,7 +29,12 @@ def upload_post():
         return render_template('upload.html', message=str(e))
     except Exception as e:
         return render_template('upload.html', message=str(e))
-    return render_template('upload.html', message=f"Found. Looks like {result['Face']['ExternalImageId']}. {result['Similarity']:3.0f}% similar.")
+
+    if result is None:
+        message = f"Face detected, but cannot identify him/her."
+    else:
+        message = f"Found. Looks like {result['Face']['ExternalImageId']}. {result['Similarity']:3.0f}% similar."
+    return render_template('upload.html', message=message)
 
 
 @app.errorhandler(500)

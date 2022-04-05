@@ -50,7 +50,11 @@ def search_face_by_image(image_bytes: bytes, collection_id: str, max_matches: in
     if len(face_matches) > 1:
         raise NotImplementedError('Not yet support multiple reference image for a single reference person.')
 
-    return face_matches[0]
+    if len(face_matches) == 0:
+        return None
+    else:
+        assert len(face_matches) == 1
+        return face_matches[0]
 
 
 if __name__ == '__main__':
