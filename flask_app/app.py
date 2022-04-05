@@ -4,8 +4,8 @@ from flask import Flask
 from flask import request, render_template
 app = Flask(__name__)
 
-from utils import *
-from utils_boto3 import *
+import utils
+import utils_boto3
 import search_face
 
 
@@ -23,9 +23,9 @@ def upload_get():
 def upload_post():
     try:
         file = request.files['file']
-        image_bytes = convert_image_bytes_popular(file.read())
+        image_bytes = utils.convert_image_bytes_popular(file.read())
         result = search_face.search_face_by_image(image_bytes=image_bytes, collection_id='idols')
-    except RequestError as e:
+    except utils_boto3.RequestError as e:
         return render_template('upload.html', message=str(e))
     except Exception as e:
         return render_template('upload.html', message=str(e))

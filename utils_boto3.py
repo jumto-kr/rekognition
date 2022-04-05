@@ -5,6 +5,9 @@ import functools
 import botocore.exceptions
 
 
+ClientError = botocore.exceptions.ClientError
+
+
 class RequestError(ValueError):
     def __init__(self, message: str, boto_exception: Optional[ botocore.exceptions.ClientError] = None):
         self.message = message

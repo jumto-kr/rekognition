@@ -3,21 +3,21 @@ from icecream import ic
 
 import boto3
 
-from utils import *
-from utils_boto3 import *
+import utils
+import utils_boto3
 
 
-class NoFaceInSearchingError(RequestError):
-    def __init__(self, boto_exception: botocore.exceptions.ClientError):
+class NoFaceInSearchingError(utils_boto3.RequestError):
+    def __init__(self, boto_exception: utils_boto3.ClientError):
         super(NoFaceInSearchingError, self).__init__(message=f'No Faces are found in the search. Each face must not be smaller than 40x40 in 1920x1080.', boto_exception=boto_exception)
 
 
-class ImageTooLargeError(RequestError):
-    def __init__(self, boto_exception: botocore.exceptions.ClientError):
+class ImageTooLargeError(utils_boto3.RequestError):
+    def __init__(self, boto_exception: utils_boto3.ClientError):
         super(ImageTooLargeError, self).__init__(message=f'Image is too large. size < 5MB and (height and width) < 4096 pixels.', boto_exception=boto_exception)
 
 
-@handle_request_error
+@utils_boto3.handle_request_error
 def search_face_id(face_id: str, collection_id: str):
     threshold = 90
     max_faces = 2
@@ -37,7 +37,7 @@ def search_face_id(face_id: str, collection_id: str):
         ic(face_match['Face'])
 
 
-@handle_request_error
+@utils_boto3.handle_request_error
 def search_face_by_image(image_bytes: bytes, collection_id: str, max_matches: int = 10, threshold: int = 70) -> dict:
     client = boto3.client('rekognition')
     try:
@@ -57,7 +57,7 @@ if __name__ == '__main__':
     image_path = './resources/jisoo_single.jpg'
     with open(image_path, 'rb') as file:
         image_bytes = file.read()
-    image_bytes = convert_image_bytes_popular(image_bytes=image_bytes)
+    image_bytes = utils.convert_image_bytes_popular(image_bytes=image_bytes)
 
     collection_id = 'idols'
     threshold = 70
