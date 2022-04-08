@@ -19,6 +19,8 @@ class RequestError(ValueError):
             except Exception:
                 self.request_id = None
 
+    __context__: ClientError
+
     def __str__(self):
         return f'{self.message}' + (f' RequestId={self.request_id}' if self.request_id is not None else '')
 

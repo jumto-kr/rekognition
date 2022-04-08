@@ -1,20 +1,13 @@
 from icecream import ic
 
-from flask import Flask
-from flask import request, render_template, redirect
-app = Flask(__name__)
+from flask_app import app
 
-import utils
-import utils_boto3
-import search_face
+from flask import request, render_template, redirect
+
+from rekognition import search_face, utils, utils_boto3
 
 CURRENT_USAGE = 0
 MAX_USAGE = 50
-
-
-@app.route('/')
-def hello():
-    return dict(message="hello")
 
 
 @app.route('/upload', methods=['POST'])
@@ -27,7 +20,7 @@ def upload_post():
     try:
         file = request.files['file']
         image_bytes = utils.convert_image_bytes_popular(file.read())
-        result = search_face.search_face_by_image(image_bytes=image_bytes, collection_id='idols')
+        result = search_face.search_face_by_image(image_bytes=image_bytes)
     except utils_boto3.RequestError as e:
         return render_template('upload.html', message=str(e))
     except Exception as e:
@@ -38,11 +31,6 @@ def upload_post():
     else:
         message = f"Found. Looks like {result['Face']['ExternalImageId']}. {result['Similarity']:3.0f}% similar."
     return render_template('upload.html', message=message)
-
-
-@app.errorhandler(500)
-def server_error(e):
-    return dict(exception=e)
 
 
 @app.route('/resetgomdev')
