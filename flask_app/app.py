@@ -14,12 +14,7 @@ MAX_USAGE = 50
 
 @app.route('/')
 def hello():
-    return render_template('index.html')
-
-
-@app.route('/upload', methods=['GET'])
-def upload_get():
-    return render_template('upload.html')
+    return dict(message="hello")
 
 
 @app.route('/upload', methods=['POST'])
@@ -47,8 +42,7 @@ def upload_post():
 
 @app.errorhandler(500)
 def server_error(e):
-    r = render_template('error.html', body=str(e.original_exception))
-    return r, 500
+    return dict(exception=e)
 
 
 @app.route('/resetgomdev')
