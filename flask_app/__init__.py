@@ -10,8 +10,8 @@ if INCLUDE_VIEWS:
 else:
     @app.route('/')
     def hello():
-        return dict(message='Hello World')
+        return models.render_template('', error_code=0, message='Hello World')
 
     @app.errorhandler(500)
     def server_error(e):
-        return dict(exception=f'{type(e)}: {str(e)}')
+        return models.render_template('', error_code=-1, body=dict(exception=f'{type(e)}: {str(e)}'))
