@@ -1,8 +1,11 @@
-from typing import Optional, Callable, Any
+import mimetypes
+from typing import Optional, Callable, Any, IO, Union
 
 import functools
+import os
 
 import botocore.exceptions
+import boto3
 
 
 ClientError = botocore.exceptions.ClientError
@@ -38,3 +41,24 @@ def handle_request_error(func: Callable[..., Any]) -> Callable[..., Any]:
             e.request_id = request_id
             raise
     return wrapper
+
+
+def upload_s3(file: Union[str, IO], bucket_name: str, key: str, content_type: Optional[str] = None, content_encoding: Optional[str] = None) -> dict:
+    if isinstance(file, str):
+        if content_type is None and content_encoding is None:
+            content_type, content_encoding = mimetypes.guess_type(file)
+
+        file_should_be_closed = True
+        file = open(file, 'rb')
+    else:
+        file_should_be_closed = False
+
+    s3_client = boto3.client('s3')
+    if os.sep == '\\':
+        key = key.replace(os.sep, '/')
+    kwargs = {key: value for key, value in dict(ContentType=content_type, ContentEncoding=content_encoding).items() if value is not None}
+    returned = s3_client.put_object(Bucket=bucket_name, Body=file, Key=key, **kwargs)
+
+    if file_should_be_closed:
+        file.close()
+    return returned

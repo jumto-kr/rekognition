@@ -27,6 +27,11 @@ class ImageTooLargeError(utils_boto3.RequestError):
         super(ImageTooLargeError, self).__init__(message=f'Image is too large. size < 5MB and (height and width) < 4096 pixels.', boto_exception=boto_exception)
 
 
+class NoMatchedFaceError(LookupError):
+    def __init__(self, collection_id: str):
+        super(NoMatchedFaceError, self).__init__(f'No matched faces in the collection {collection_id}.')
+
+
 @utils_boto3.handle_request_error
 def _search_face_id(face_id: str, collection_id: str):
     threshold = 90
@@ -63,7 +68,7 @@ def _search_face_by_image(image_bytes: bytes, collection_id: str, max_matches: i
         pass
 
     if len(face_matches) == 0:
-        return None
+        raise NoMatchedFaceError(collection_id=collection_id)
     else:
         # TODO:
         # assert len(face_matches) == 1
@@ -82,9 +87,5 @@ if __name__ == '__main__':
     with open(image_path, 'rb') as file:
         image_bytes = file.read()
     image_bytes = utils.convert_image_bytes_popular(image_bytes=image_bytes)
-
-    collection_id = 'idols'
-    threshold = 70
-    max_matches = 3
 
     ic(search_face_by_image(image_bytes=image_bytes))
