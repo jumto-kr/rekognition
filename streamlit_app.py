@@ -1,6 +1,15 @@
+from typing import TypedDict
+
 import streamlit as st
 
+import rekognition
+
 import utils_streamlit
+
+
+class MatchParsed(TypedDict):
+    idol: rekognition.Idol
+    similarity: float
 
 
 st.write("hello")
@@ -11,4 +20,13 @@ file = st.file_uploader('Image of the star you are watching.', type=['jpg', 'jpe
 
 if file is not None:
     matches_response = utils_streamlit.call_api(url_path='/upload', method='POST', files=dict(file=file.read()))
+    matches_parsed: list[MatchParsed] = []
+    for each_match in matches_response['matches']:
+        idol = rekognition.Idol.from_external_image_id(each_match['Face']['ExternalImageId'])
+        similarity = each_match['Similarity']
+        matches_parsed.append(dict(idol=idol, similarity=similarity))
+
+    for match_parsed in matches_parsed:
+        st.write(match_parsed['idol'].repr_name, match_parsed['similarity'])
+
     st.write(matches_response)

@@ -40,7 +40,7 @@ def upload_post():
     else:
         message = f"Found. Looks like {result['Face']['ExternalImageId']}. {result['Similarity']:3.0f}% similar."
         assert hasattr(result, 'keys') and hasattr(result, 'values'), "Result is expected as dict-like."
-        matches = [result['Face']]
+        matches = [result]
         error_code = 0
     return render_template('upload.html', error_code=error_code, message=message, matches=matches)
 
