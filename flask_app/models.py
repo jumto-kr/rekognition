@@ -45,6 +45,11 @@ def upload_post():
     return render_template('upload.html', error_code=error_code, message=message, matches=matches)
 
 
+@app.route('/detail/<repr_name>')
+def detail(repr_name):
+    return repr_name
+
+
 @app.route('/resetgomdev')
 def resetgomdev():
     global CURRENT_USAGE
