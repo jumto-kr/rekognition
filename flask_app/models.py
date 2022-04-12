@@ -1,5 +1,6 @@
 from typing import Optional
 
+import os
 from icecream import ic
 
 from flask_app import app
@@ -11,7 +12,7 @@ if not flask_app.INCLUDE_VIEWS:
     def render_template(_: Optional[str], error_code: int, **kwargs) -> dict:
         assert 'error_code' not in kwargs
         return dict(error_code=error_code, body=kwargs)
-from rekognition import search_face, utils, utils_boto3
+from rekognition import search_face, utils, utils_boto3, config
 
 CURRENT_USAGE = 0
 MAX_USAGE = 50
@@ -46,8 +47,10 @@ def upload_post():
 
 
 @app.route('/detail/<repr_name>')
-def detail(repr_name):
-    return repr_name
+def detail(repr_name: str):
+    s3_object_key = f'{config.idols_profile_root_path}/{repr_name}/detail.md'
+    returned = utils_boto3.download_s3(bucket_name=config.idols_bucket_name, key=s3_object_key)
+    return render_template('', error_code=0, markdown=returned.decode())
 
 
 @app.route('/resetgomdev')
