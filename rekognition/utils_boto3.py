@@ -62,3 +62,9 @@ def upload_s3(file: Union[str, IO], bucket_name: str, key: str, content_type: Op
     if file_should_be_closed:
         file.close()
     return returned
+
+
+def download_s3(bucket_name: str, key: str) -> bytes:
+    s3_client = boto3.client('s3')
+    returned = s3_client.get_object(Bucket=bucket_name, Key=key)['Body'].read()
+    return returned
