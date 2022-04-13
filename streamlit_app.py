@@ -1,7 +1,5 @@
 from typing import TypedDict
 
-import os
-
 import streamlit as st
 
 import rekognition
