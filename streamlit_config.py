@@ -1,4 +1,5 @@
 import os
 
-API_URL_PROTOCOL = 'http://'
-API_URL_HOST = os.environ['IDOL_STREAMLIT_API_URL_HOST']
+api_url_protocol = 'http://'
+api_url_host = os.environ['IDOL_STREAMLIT_API_URL_HOST']
+image_types = ['jpg', 'jpeg', 'png', 'bmp', 'gif', 'webp']

@@ -8,6 +8,7 @@ import streamlit as st
 import flask_app.models
 import rekognition
 import utils_streamlit
+import streamlit_config
 
 
 class MatchParsed(TypedDict):
@@ -21,7 +22,7 @@ def suggest_line_width(size: Tuple[float, float]) -> int:
 
 
 if __name__ == '__main__':
-    file = st.file_uploader('Image of the star you are watching.', type=['jpg', 'jpeg', 'png', 'bmp', 'gif', 'webp'])
+    file = st.file_uploader('Image of the star you are watching.', type=streamlit_config.image_types)
 
     if file is not None:
         file_bytes = file.read()

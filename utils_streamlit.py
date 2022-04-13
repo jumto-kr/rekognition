@@ -5,8 +5,8 @@ import requests
 import streamlit_config
 
 
-assert streamlit_config.API_URL_PROTOCOL.endswith('://')
-assert not streamlit_config.API_URL_HOST.endswith('/')
+assert streamlit_config.api_url_protocol.endswith('://')
+assert not streamlit_config.api_url_host.endswith('/')
 
 
 class ErrorResponse(Exception):
@@ -37,4 +37,4 @@ def fetch(url: str, method: str = 'GET', data: Optional[Dict[str, Any]] = None, 
 def call_api(url_path: str, method: str = 'GET', data: Optional[Dict[str, Any]] = None, files: Optional[Dict[str, IO]] = None) -> Dict[str, Any]:
     if not url_path.startswith('/'):
         url_path = '/' + url_path
-    return fetch(url=f'{streamlit_config.API_URL_PROTOCOL}{streamlit_config.API_URL_HOST}{url_path}', method=method, data=data, files=files)
+    return fetch(url=f'{streamlit_config.api_url_protocol}{streamlit_config.api_url_host}{url_path}', method=method, data=data, files=files)
