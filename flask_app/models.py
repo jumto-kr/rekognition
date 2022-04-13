@@ -5,7 +5,7 @@ from icecream import ic
 
 from flask_app import app
 
-from flask import request, render_template, redirect
+from flask import request, render_template
 
 import flask_app
 if not flask_app.INCLUDE_VIEWS:
@@ -58,4 +58,4 @@ def resetgomdev():
     global CURRENT_USAGE
     CURRENT_USAGE = 0
 
-    return redirect('/')
+    return render_template('', error_code=0, message=f"Reset done. CURRENT_USAGE={CURRENT_USAGE}, MAX_USAGE={MAX_USAGE}")
