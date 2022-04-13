@@ -33,26 +33,6 @@ class NoMatchedFaceError(LookupError):
 
 
 @utils_boto3.handle_request_error
-def _search_face_id(face_id: str, collection_id: str):
-    threshold = 90
-    max_faces = 2
-    client = boto3.client('rekognition')
-    try:
-        response = client.search_faces(CollectionId=collection_id, FaceId=face_id, FaceMatchThreshold=threshold, MaxFaces=max_faces)
-    except client.exceptions.InvalidParameterException as e:
-        raise NoFaceInSearchingError(boto_exception=e)
-    except client.exceptions.ImageTooLargeException as e:
-        raise ImageTooLargeError(boto_exception=e)
-
-    assert response['SearchedFaceId'] == face_id
-    assert len(response['FaceMatches']) >= 1
-    assert list(response['FaceMatches']) == list(sorted(response['FaceMatches'], key=lambda face_match: face_match['Similarity'], reverse=True))
-
-    for face_match in list(response['FaceMatches']):
-        ic(face_match['Face'])
-
-
-@utils_boto3.handle_request_error
 def _search_face_by_image(image_bytes: bytes, collection_id: str, max_matches: int = 10, threshold: int = 40) -> dict:
     client = boto3.client('rekognition')
     try:
