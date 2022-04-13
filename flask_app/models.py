@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, TypedDict, List
 
 import os
 from icecream import ic
@@ -9,7 +9,10 @@ from flask import request, render_template
 
 import flask_app
 if not flask_app.INCLUDE_VIEWS:
-    def render_template(_: Optional[str], error_code: int, **kwargs) -> dict:
+    class RenderTemplateResponse(TypedDict):
+        error_code: int
+        body: dict
+    def render_template(_: Optional[str], error_code: int, **kwargs) -> RenderTemplateResponse:
         assert 'error_code' not in kwargs
         return dict(error_code=error_code, body=kwargs)
 from rekognition import search_face, utils, utils_boto3, config
@@ -18,6 +21,9 @@ CURRENT_USAGE = 0
 MAX_USAGE = 50
 
 
+class UploadPostPayload(TypedDict):
+    matches: List[utils_boto3.FaceMatch]
+    searched_face_bounding_box: utils_boto3.BoundingBox
 @app.route('/upload', methods=['POST'])
 def upload_post():
     global CURRENT_USAGE
@@ -28,7 +34,7 @@ def upload_post():
     try:
         file = request.files['file']
         image_bytes = utils.convert_image_bytes_popular(file.read())
-        result = search_face.search_face_by_image(image_bytes=image_bytes)
+        result: search_face.ParsedSearchFaceResponse = search_face.search_face_by_image(image_bytes=image_bytes)
     except utils_boto3.RequestError as e:
         return render_template('upload.html', error_code=-1, message=str(e))
     except Exception as e:
@@ -36,16 +42,18 @@ def upload_post():
 
     if result is None:
         message = f"Face detected, but cannot identify him/her."
-        matches = []
+        response_payload = dict()
         error_code = -1
     else:
-        message = f"Found. Looks like {result['Face']['ExternalImageId']}. {result['Similarity']:3.0f}% similar."
-        assert hasattr(result, 'keys') and hasattr(result, 'values'), "Result is expected as dict-like."
-        matches = [result]
+        message = f"Found. Looks like {result['MostFaceMatch']['Face']['ExternalImageId']}. {result['MostFaceMatch']['Similarity']:3.0f}% similar."
+        assert hasattr(result['MostFaceMatch'], 'keys') and hasattr(result['MostFaceMatch'], 'values'), "Result is expected as dict-like."
+        response_payload = UploadPostPayload(matches=[result['MostFaceMatch']], searched_face_bounding_box=result['SearchedFaceBoundingBox'])
         error_code = 0
-    return render_template('upload.html', error_code=error_code, message=message, matches=matches)
+    return render_template('upload.html', error_code=error_code, message=message, **response_payload)
 
 
+class DetailPayload(TypedDict):
+    markdown: str
 @app.route('/detail/<repr_name>')
 def detail(repr_name: str):
     s3_object_key = f'{config.idols_profile_root_path}/{repr_name}/detail.md'

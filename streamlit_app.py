@@ -25,7 +25,7 @@ if file is not None:
 
         st.write(idol.repr_name, similarity)
 
-        detail_response = utils_streamlit.call_api(url_path=f'/detail/{idol.repr_name}')
+        detail_response: flask_app.models.DetailPayload = utils_streamlit.call_api(url_path=f'/detail/{idol.repr_name}')
         detail_md = detail_response['markdown']
         st.markdown(detail_md)
 

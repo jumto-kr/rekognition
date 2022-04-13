@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, TypedDict, List
 
 from icecream import ic
 # ic = print
@@ -32,11 +32,19 @@ class NoMatchedFaceError(LookupError):
         super(NoMatchedFaceError, self).__init__(f'No matched faces in the collection {collection_id}.')
 
 
+class SearchFaceResponse(TypedDict):
+    SearchedFaceBoundingBox: utils_boto3.BoundingBox
+    SearchedFaceConfidence: float
+    FaceMatches: List[utils_boto3.FaceMatch]
+    ResponseMetadata: dict
+class ParsedSearchFaceResponse(TypedDict):
+    SearchedFaceBoundingBox: utils_boto3.BoundingBox
+    MostFaceMatch: utils_boto3.FaceMatch
 @utils_boto3.handle_request_error
-def _search_face_by_image(image_bytes: bytes, collection_id: str, max_matches: int = 10, threshold: int = 40) -> dict:
+def _search_face_by_image(image_bytes: bytes, collection_id: str, max_matches: int = 10, threshold: int = 40) -> ParsedSearchFaceResponse:
     client = boto3.client('rekognition')
     try:
-        response = client.search_faces_by_image(CollectionId=collection_id, Image={'Bytes': image_bytes}, FaceMatchThreshold=threshold, MaxFaces=max_matches)
+        response: SearchFaceResponse = client.search_faces_by_image(CollectionId=collection_id, Image={'Bytes': image_bytes}, FaceMatchThreshold=threshold, MaxFaces=max_matches)
     except client.exceptions.InvalidParameterException as e:
         raise NoFaceInSearchingError(boto_exception=e)
     except client.exceptions.ImageTooLargeException as e:
@@ -52,10 +60,10 @@ def _search_face_by_image(image_bytes: bytes, collection_id: str, max_matches: i
     else:
         # TODO:
         # assert len(face_matches) == 1
-        return face_matches[0]
+        return dict(MostFaceMatch=face_matches[0], SearchedFaceBoundingBox=response['SearchedFaceBoundingBox'])
 
 
-def search_face_by_image(image_bytes: bytes, threshold: Optional[int] = None) -> dict:
+def search_face_by_image(image_bytes: bytes, threshold: Optional[int] = None) -> ParsedSearchFaceResponse:
     collection_id = config.idols_collection_id
     max_matches = config.max_matches
     threshold = threshold if threshold is not None else config.default_threshold

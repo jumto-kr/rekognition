@@ -1,5 +1,5 @@
 import mimetypes
-from typing import Optional, Callable, Any, IO, Union
+from typing import Optional, Callable, Any, IO, Union, TypedDict
 
 import functools
 import os
@@ -68,3 +68,23 @@ def download_s3(bucket_name: str, key: str) -> bytes:
     s3_client = boto3.client('s3')
     returned = s3_client.get_object(Bucket=bucket_name, Key=key)['Body'].read()
     return returned
+
+
+class BoundingBox(TypedDict):
+    Width: float
+    Height: float
+    Left: float
+    Top: float
+
+
+class Face(TypedDict):
+    FaceId: str
+    BoundingBox: BoundingBox
+    ImageId: str
+    ExternalImageId: str
+    Confidence: float
+
+
+class FaceMatch(TypedDict):
+    Similarity: float
+    Face: Face
