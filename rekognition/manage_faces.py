@@ -17,7 +17,7 @@ except ImportError:
     import utils_boto3
     from caching_boto3 import list_faces
 if not config.VERBOSE:
-    def tqdm(iterable=None, *args, **kwargs):
+    def tqdm(iterable=None, *_, **__):
         return iterable
 
 

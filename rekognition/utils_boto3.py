@@ -12,7 +12,7 @@ ClientError = botocore.exceptions.ClientError
 
 
 class RequestError(ValueError):
-    def __init__(self, message: str, boto_exception: Optional[ botocore.exceptions.ClientError] = None):
+    def __init__(self, message: str, boto_exception: Optional[botocore.exceptions.ClientError] = None):
         self.message = message
 
         if boto_exception is not None:
@@ -82,7 +82,7 @@ def to_abs_bounding_box_corners(bounding_box: BoundingBox, size: Tuple[float, fl
     y1_rel = bounding_box['Top'] + bounding_box['Height']
 
     x0_abs, x1_abs = [(x * size[0]) for x in [x0_rel, x1_rel]]
-    y0_abs, y1_abs = [(y* size[1]) for y in [y0_rel, y1_rel]]
+    y0_abs, y1_abs = [(y * size[1]) for y in [y0_rel, y1_rel]]
     return x0_abs, y0_abs, x1_abs, y1_abs
 
 
