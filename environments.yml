@@ -3,14 +3,6 @@ channels:
   - defaults
   - conda-forge
 dependencies:
-  - python=3.9
   - pip
+  - python=3.8
   - pipreqs
-  - pip:
-      - streamlit==1.8.1
-      - icecream==2.1.2
-      - requests==2.27.1
-      - botocore==1.24.33
-      - boto3==1.21.32
-      - Flask==2.1.1
-      - Pillow==9.1.0
